@@ -1,0 +1,77 @@
+{*
+Example for USB_UART Click
+
+    Date          : Dec 2017.
+    Author        : MikroE Team
+
+Test configuration CEC :
+    
+    MCU              : CEC1702
+    Dev. Board       : Clicker 2 for CEC1702
+    ARM Compiler ver : v6.0.0.0
+
+---
+
+Description :
+
+The application is composed of three sections :
+
+- System Initialization - Intializes UART module
+- Application Initialization - Driver intialization
+- Application Task - (code snippet) - Checks if new data byte have received in rx buffer (ready for reading),
+  and if ready than reads one byte from rx buffer. In second case aplication task writes
+  message data via UART.
+
+
+*}
+program Click_USB_UART_CEC;
+
+uses Click_USB_UART_types, Click_USB_UART_config;
+
+const
+    MESSAGE_DATA : array[9] of uint8_t = ('M', 'i', 'k', 'r', 'o', 'E', 13, 10, 0); 
+    
+procedure systemInit(); 
+begin
+
+    mikrobus_uartInit(_MIKROBUS1, @_USB_UART_UART_CFG[0]); 
+    mikrobus_logInit(_MIKROBUS1, 9600); 
+    Delay_ms(100); 
+
+end;
+
+procedure applicationInit(); 
+begin
+
+    usb_uart_uartDriverInit(T_USB_UART_P(@_MIKROBUS1_GPIO), T_USB_UART_P(@_MIKROBUS1_UART)); 
+    mikrobus_logWrite('Initialized', _LOG_LINE); 
+    Delay_ms(100); 
+
+end;
+
+procedure applicationTask(); 
+var
+    tmp : uint8_t;
+    rec : char;
+    rdyFlag : uint8_t;
+begin
+
+    rdyFlag := usb_uart_byteReady(); 
+    if ((1 = rdyFlag)) then 
+    begin
+        rec := usb_uart_readByte(); 
+        mikrobus_logWrite(@rec, _LOG_BYTE); 
+    end; 
+
+end;
+
+begin
+
+    systemInit(); 
+    applicationInit(); 
+    while (1) do 
+    begin 
+        applicationTask(); 
+    end;
+
+end.

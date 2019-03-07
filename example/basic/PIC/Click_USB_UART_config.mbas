@@ -1,0 +1,8 @@
+module Click_USB_UART_config
+
+include Click_USB_UART_types
+
+const
+    _USB_UART_UART_CFG as uint32_t[1] = (9600)
+    
+end.
